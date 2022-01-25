@@ -21,23 +21,23 @@ const app = express();
 
 app.use((req, res, next) => {
   console.log('test');
-  if (req.protocol === 'https' && typeof req.socket.getProtocol === 'function')
-  {
-    const protocolVersion = req.socket.getProtocol()
-    console.log(protocolVersion);
-    if (protocolVersion != 'TLSv1.2' && protocolVersion != 'TLSv1.3')
-    {
-      // dbLogger.LogError('Unsupported protocol version: ' + protocolVersion, req)
-    }
-  } else {
-    // dbLogger.LogError('test', req);
-  }
+  // if (req.protocol === 'https' && typeof req.socket.getProtocol === 'function')
+  // {
+  //   const protocolVersion = req.socket.getProtocol()
+  //   console.log(protocolVersion);
+  //   if (protocolVersion != 'TLSv1.2' && protocolVersion != 'TLSv1.3')
+  //   {
+  //     // dbLogger.LogError('Unsupported protocol version: ' + protocolVersion, req)
+  //   }
+  // } else {
+  //   // dbLogger.LogError('test', req);
+  // }
 
-  // res.header('Access-Control-Allow-Origin', '*');
-  // res.header(
-  //   'Access-Control-Allow-Headers',
-  //   'Origin, X-Requested-With, Content-Type, Accept'
-  // );
+  // // res.header('Access-Control-Allow-Origin', '*');
+  // // res.header(
+  // //   'Access-Control-Allow-Headers',
+  // //   'Origin, X-Requested-With, Content-Type, Accept'
+  // // );
 
   next();
 });
@@ -47,20 +47,30 @@ app.get('/', (req, res) => {
 });
 
 app.post('/', (req, res) => {
+  console.log(typeof req.socket);
+
+  const body = {};
+  if (typeof req.socket == 'TLSSocket')
+  {
+    body['tlsVersion'] = req.socket.getProtocol();
+    body['tlsCipher'] = req.socket.getCipher();
+    body['cipers'] = tls.getCiphers();
+    // TODO: add remote peer properties
+  }
 
   // const body = {};
 
-  if (req.protocol === 'https' && typeof req.socket.getProtocol === 'function')
-  {
-    const protocolVersion = req.socket.getProtocol()
-    console.log(protocolVersion);
-    if (protocolVersion != 'TLSv1.2' && protocolVersion != 'TLSv1.3')
-    {
-      res.status(426).send('Unsupported protocol version: ' + protocolVersion).end();
-    }
-  }
+  // if (req.protocol === 'https' && typeof req.socket.getProtocol === 'function')
+  // {
+  //   const protocolVersion = req.socket.getProtocol()
+  //   console.log(protocolVersion);
+  //   if (protocolVersion != 'TLSv1.2' && protocolVersion != 'TLSv1.3')
+  //   {
+  //     res.status(426).send('Unsupported protocol version: ' + protocolVersion).end();
+  //   }
+  // }
 
-  res.status(200).send({}).end();
+  res.status(200).send(body).end();
 
 });
 
