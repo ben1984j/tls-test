@@ -19,8 +19,49 @@ const express = require('express');
 
 const app = express();
 
+app.use((req, res, next) => {
+  console.log('test');
+  if (req.protocol === 'https' && typeof req.socket.getProtocol === 'function')
+  {
+    const protocolVersion = req.socket.getProtocol()
+    console.log(protocolVersion);
+    if (protocolVersion != 'TLSv1.2' && protocolVersion != 'TLSv1.3')
+    {
+      // dbLogger.LogError('Unsupported protocol version: ' + protocolVersion, req)
+    }
+  } else {
+    // dbLogger.LogError('test', req);
+  }
+
+  // res.header('Access-Control-Allow-Origin', '*');
+  // res.header(
+  //   'Access-Control-Allow-Headers',
+  //   'Origin, X-Requested-With, Content-Type, Accept'
+  // );
+
+  next();
+});
+
 app.get('/', (req, res) => {
   res.status(200).send('Hello, world!').end();
+});
+
+app.post('/', (req, res) => {
+
+  // const body = {};
+
+  if (req.protocol === 'https' && typeof req.socket.getProtocol === 'function')
+  {
+    const protocolVersion = req.socket.getProtocol()
+    console.log(protocolVersion);
+    if (protocolVersion != 'TLSv1.2' && protocolVersion != 'TLSv1.3')
+    {
+      res.status(426).send('Unsupported protocol version: ' + protocolVersion).end();
+    }
+  }
+
+  res.status(200).send({}).end();
+
 });
 
 // Start the server
